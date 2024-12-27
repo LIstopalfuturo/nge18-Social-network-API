@@ -14,19 +14,15 @@ const thoughtSchema = new Schema(
       type: Date,
       default: Date.now,
       get:(date)=>{
-        return date.toDateString();
+        return date.toLocalDateString();
       }
     },
     username: {
       type: String,
       require: true,
     },
-    description: {
-      type: String,
-      minLength: 8,
-      maxLength: 500,
-    },
-    responses: [Response],
+   
+    reaction: [Reaction],
   },
   {
     toJSON: {
