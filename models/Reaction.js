@@ -19,7 +19,7 @@ const responseSchema = new Schema(
       type: Date,
       default: Date.now,
       get:(Date)=>{
-        return Date.toLocalDateString();
+        return Date.toLocaleDateString();
       }
     },
   },

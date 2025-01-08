@@ -4,7 +4,7 @@ const Reaction = require('./Reaction');
 // Schema to create Thought model
 const thoughtSchema = new Schema(
   {
-    ThoughtText: {
+    thoughtText: {
       type: String,
       required: true,
       minLength: 1,
@@ -14,7 +14,7 @@ const thoughtSchema = new Schema(
       type: Date,
       default: Date.now,
       get:(date)=>{
-        return date.toLocalDateString();
+        return date.toLocaleDateString();
       }
     },
     username: {
@@ -22,7 +22,7 @@ const thoughtSchema = new Schema(
       require: true,
     },
    
-    reaction: [Reaction],
+    reactions: [Reaction],
   },
   {
     toJSON: {
@@ -37,7 +37,7 @@ thoughtSchema
   .virtual('getResponses')
   // Getter
   .get(function () {
-    return this.responses.length;
+    return this.reactions.length;
   });
 
 // Initialize our Thought model
