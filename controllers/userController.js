@@ -1,18 +1,31 @@
-const User = require('../models/User');
+const { User } = require('../models');
 
 module.exports = {
+  // Get all users
   async getUsers(req, res) {
     try {
-      const users = await User.find();
+      const users = await User.find();  // Simplified query first
+      
+      if (!users) {
+        return res.status(404).json({ message: 'No users found' });
+      }
+
+      console.log('Retrieved users:', users); // Debug log
       res.json(users);
     } catch (err) {
-      res.status(500).json(err);
+      console.log('Error in getUsers:', err); // Debug log
+      res.status(500).json({ 
+        message: 'Error retrieving users',
+        error: err.message 
+      });
     }
   },
   async getSingleUser(req, res) {
     try {
       const user = await User.findOne({ _id: req.params.userId })
-        .select('-__v');
+        .select('-__v')
+        .populate("thoughts")
+        .populate("friends");
 
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
@@ -53,15 +66,26 @@ module.exports = {
   },
   async deleteUser(req, res) {
     try {
+      console.log('Attempting to delete user with ID:', req.params.userId);
       const user = await User.findOneAndDelete({ _id: req.params.userId });
 
       if (!user) {
-        return res.status(404).json({ message: 'No user with this id!' });
+        return res.status(404).json({ 
+          message: 'No user with this id!', 
+          requestedId: req.params.userId 
+        });
       }
 
-      res.json({ message: 'User successfully deleted!' });
+      res.json({ 
+        message: 'User successfully deleted!',
+        deletedUser: user 
+      });
     } catch (err) {
-      res.status(500).json(err);
+      console.log('Error deleting user:', err);
+      res.status(500).json({ 
+        message: 'Error deleting user',
+        error: err.message 
+      });
     }
   },
   // Add a user reaction

@@ -11,21 +11,20 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      unique: true,
       required: true,
-      match: [/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/]
+      unique: true,
+      match: [/.+@.+\..+/, 'Must match an email address!'],
     },
-    age: Number,
     thoughts: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'thoughts',
+        ref: 'Thought',
       },
     ],
     friends: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'user',
+        ref: 'User',
       },
     ],
   },
@@ -44,11 +43,11 @@ userSchema
   .virtual('friendCount')
   // Getter
   .get(function () {
-    return `${this.friends.length} `;
+    return this.friends.length;
   })
  
 
 // Initialize our User model
-const User = model('user', userSchema);
+const User = model('User', userSchema);
 
 module.exports = User;
