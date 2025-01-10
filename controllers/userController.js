@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Thought } = require('../models');
 
 module.exports = {
   // Get all users
@@ -69,15 +69,35 @@ module.exports = {
   // Delete a user
   async deleteUser(req, res) {
     try {
-      const user = await User.findOneAndDelete({ _id: req.params.userId });
+      console.log('Attempting to delete user ID:', req.params.userId); // Debug log
+      
+      // Find the user first
+      const user = await User.findById(req.params.userId);
+      console.log('Found user:', user); // Debug log
 
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
       }
 
-      res.json({ message: 'User deleted!' });
+      // Delete all thoughts associated with the user
+      await Thought.deleteMany({ username: user.username });
+
+      // Remove user from other users' friends lists
+      await User.updateMany(
+        { friends: req.params.userId },
+        { $pull: { friends: req.params.userId } }
+      );
+
+      // Delete the user
+      await User.findByIdAndDelete(req.params.userId);
+
+      res.json({ message: 'User and associated thoughts deleted!' });
     } catch (err) {
-      res.status(500).json(err);
+      console.log('Error:', err);
+      res.status(500).json({ 
+        message: 'Error deleting user',
+        error: err.message 
+      });
     }
   },
 
