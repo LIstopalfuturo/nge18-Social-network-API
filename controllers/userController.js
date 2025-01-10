@@ -69,29 +69,25 @@ module.exports = {
   // Delete a user
   async deleteUser(req, res) {
     try {
-      console.log('Attempting to delete user ID:', req.params.userId); // Debug log
+      console.log('Attempting to delete user ID:', req.params.userId);
       
-      // Find the user first
-      const user = await User.findById(req.params.userId);
-      console.log('Found user:', user); // Debug log
-
+      // Use findOneAndDelete instead of findById
+      const user = await User.findOneAndDelete({ _id: req.params.userId });
+      
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
       }
 
-      // Delete all thoughts associated with the user
+      // Delete associated thoughts
       await Thought.deleteMany({ username: user.username });
 
-      // Remove user from other users' friends lists
+      // Remove from friends lists
       await User.updateMany(
         { friends: req.params.userId },
         { $pull: { friends: req.params.userId } }
       );
 
-      // Delete the user
-      await User.findByIdAndDelete(req.params.userId);
-
-      res.json({ message: 'User and associated thoughts deleted!' });
+      res.json({ message: 'User and associated data deleted!' });
     } catch (err) {
       console.log('Error:', err);
       res.status(500).json({ 
