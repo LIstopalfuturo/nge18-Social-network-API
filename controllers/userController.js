@@ -4,10 +4,20 @@ module.exports = {
   // Get all users
   async getUsers(req, res) {
     try {
-      const users = await User.find();
+      const users = await User.find({}).exec();  // Force execution with exec()
+      console.log('Retrieved users:', users); // Debug log
+      
+      if (!users || users.length === 0) {
+        return res.status(404).json({ message: 'No users found' });
+      }
+
       res.json(users);
     } catch (err) {
-      res.status(500).json(err);
+      console.log('Error in getUsers:', err); // Debug log
+      res.status(500).json({ 
+        message: 'Error retrieving users',
+        error: err.message 
+      });
     }
   },
 
@@ -40,10 +50,18 @@ module.exports = {
   // Create a user
   async createUser(req, res) {
     try {
+      console.log('Creating user with data:', req.body); // Debug log
+      
       const user = await User.create(req.body);
+      console.log('Created user:', user); // Debug log
+      
       res.json(user);
     } catch (err) {
-      res.status(500).json(err);
+      console.log('Error creating user:', err); // Debug log
+      res.status(500).json({ 
+        message: 'Error creating user',
+        error: err.message 
+      });
     }
   },
 
