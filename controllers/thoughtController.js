@@ -3,13 +3,21 @@ const { Thought, User } = require('../models');
 module.exports = {
   async getThoughts(req, res) {
     try {
-      const thoughts = await Thought.find()
-        .populate('userId')
-        .sort({ createdAt: -1 });
+      const thoughts = await Thought.find();
+      
+      console.log('Retrieved thoughts:', thoughts); // Debug log
+      
+      if (!thoughts) {
+        return res.status(404).json({ message: 'No thoughts found' });
+      }
+
       res.json(thoughts);
     } catch (err) {
-      console.log(err);
-      res.status(500).json(err);
+      console.log('Error in getThoughts:', err); // Debug log
+      res.status(500).json({ 
+        message: 'Error retrieving thoughts',
+        error: err.message 
+      });
     }
   },
   async getSingleThought(req, res) {
@@ -41,7 +49,7 @@ module.exports = {
         });
       }
 
-      res.json('Created the thought 🎉');
+      res.json(thought);
     } catch (err) {
       console.log(err);
       res.status(500).json(err);
@@ -74,16 +82,10 @@ module.exports = {
       }
 
       const user = await User.findOneAndUpdate(
-        { username: req.body.username },
+        { thoughts: req.params.thoughtId },
         { $pull: { thoughts: req.params.thoughtId } },
         { new: true }
       );
-
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: 'Thought created but no user with this id!' });
-      }
 
       res.json({ message: 'Thought successfully deleted!' });
     } catch (err) {
