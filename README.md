@@ -54,7 +54,7 @@ The API provides the following functionality:
 - DELETE `/api/thoughts/:thoughtId/reactions/:reactionId` - Remove reaction
 
 ## Demo Video
-[Click here to watch the demonstration video](your-video-link-here)
+[Click here to watch the demonstration video](https://1drv.ms/v/c/2cebbbbed41529a2/EfK279O4LjhGrNqau4PimsoBEl-W3Npc6C47K-ZEq9mgVg?e=QYUYcs)
 
 
 ## Technologies Used

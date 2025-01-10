@@ -50,14 +50,25 @@ module.exports = {
   // Create a user
   async createUser(req, res) {
     try {
-      console.log('Creating user with data:', req.body); // Debug log
+      console.log('Creating user with data:', req.body);
       
-      const user = await User.create(req.body);
-      console.log('Created user:', user); // Debug log
-      
-      res.json(user);
+      const newUser = new User({
+        username: req.body.username,
+        email: req.body.email,
+        thoughts: [],
+        friends: []
+      });
+
+      const savedUser = await newUser.save();
+      console.log('Saved user to database:', savedUser);
+
+      // Verify it was saved
+      const verifyUser = await User.findById(savedUser._id);
+      console.log('Verified user in database:', verifyUser);
+
+      res.json(savedUser);
     } catch (err) {
-      console.log('Error creating user:', err); // Debug log
+      console.log('Error creating user:', err);
       res.status(500).json({ 
         message: 'Error creating user',
         error: err.message 
