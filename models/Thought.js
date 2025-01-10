@@ -1,32 +1,54 @@
-const { Schema, model } = require('mongoose');
-const Reaction = require('./Reaction');
+const { Schema, model, Types } = require('mongoose');
 
-// Schema to create Thought model
-const thoughtSchema = new Schema(
+// Create reaction schema
+const reactionSchema = new Schema(
   {
-    thoughtText: {
+    reactionId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
+    },
+    reactionBody: {
       type: String,
       required: true,
-      minLength: 1,
-      maxLength: 280,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      get:(date)=>{
-        return date.toLocaleDateString();
-      }
+      maxlength: 280,
     },
     username: {
       type: String,
       required: true,
     },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-      required: true
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: timestamp => new Date(timestamp).toLocaleString(),
     },
-    reactions: [Reaction],
+  },
+  {
+    toJSON: {
+      getters: true,
+    },
+    id: false,
+  }
+);
+
+// Create thought schema
+const thoughtSchema = new Schema(
+  {
+    thoughtText: {
+      type: String,
+      required: true,
+      minlength: 1,
+      maxlength: 280,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: timestamp => new Date(timestamp).toLocaleString(),
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    reactions: [reactionSchema],
   },
   {
     toJSON: {
@@ -37,15 +59,10 @@ const thoughtSchema = new Schema(
   }
 );
 
-// Create a virtual property `responses` that gets the amount of response per thought
-thoughtSchema
-  .virtual('getResponses')
-  // Getter
-  .get(function () {
-    return this.reactions.length;
-  });
+thoughtSchema.virtual('reactionCount').get(function() {
+  return this.reactions.length;
+});
 
-// Initialize our Thought model
-const Thought = model('thoughts', thoughtSchema);
+const Thought = model('Thought', thoughtSchema);
 
 module.exports = Thought;
